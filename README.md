@@ -11,5 +11,5 @@ sudo bash vf.install.sh
 ou
 ~~ 
 
-sudo curl -fsSL https://raw.githubusercontent.com/Andrinno/viajaflux-dev-tools/main/vf.install.sh | bash
+sudo curl -fsSL https://raw.githubusercontent.com/Andrinno/viajaflux-dev-tools/main/vf.install.sh | sudo bash
 
