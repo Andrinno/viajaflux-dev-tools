@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VF_VERSION="1.0.0"
-VF_REPO="https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main"
+VF_REPO="https://raw.githubusercontent.com/Andrinno/viajaflux-dev-tools/main"
 
 # Colors
 GREEN="\033[0;32m"
@@ -13,7 +13,10 @@ NC="\033[0m"
 log() { echo -e "${GREEN}✔${NC} $1"; }
 info() { echo -e "${BLUE}ℹ${NC} $1"; }
 warn() { echo -e "${YELLOW}⚠${NC} $1"; }
-error() { echo -e "${RED}✖${NC} $1"; exit 1; }
+error() {
+  echo -e "${RED}✖${NC} $1"
+  exit 1
+}
 
 ensure_git() {
   git rev-parse --is-inside-work-tree >/dev/null 2>&1 || error "Este diretório não é um repositório Git."
@@ -149,7 +152,7 @@ cmd_update() {
 # Help
 # ----------------------
 cmd_help() {
-cat <<EOF
+  cat <<EOF
 ${BLUE}Viajaflux Git Flow Helper${NC}
 
 Comandos disponíveis:
@@ -167,15 +170,14 @@ EOF
 
 # Router
 case "$1" in
-  up) cmd_up ;;
-  feat) cmd_feat "$2" ;;
-  hotfix) cmd_hotfix "$2" ;;
-  sync) cmd_sync ;;
-  clean) cmd_clean ;;
-  status) cmd_status ;;
-  version) cmd_version ;;
-  update) cmd_update ;;
-  help|"") cmd_help ;;
-  *) error "Comando inválido. Use: vf help" ;;
+up) cmd_up ;;
+feat) cmd_feat "$2" ;;
+hotfix) cmd_hotfix "$2" ;;
+sync) cmd_sync ;;
+clean) cmd_clean ;;
+status) cmd_status ;;
+version) cmd_version ;;
+update) cmd_update ;;
+help | "") cmd_help ;;
+*) error "Comando inválido. Use: vf help" ;;
 esac
-

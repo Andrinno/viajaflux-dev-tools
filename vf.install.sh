@@ -2,7 +2,7 @@
 
 set -e
 
-VF_REPO="https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main"
+VF_REPO="https://raw.githubusercontent.com/Andrinno/viajaflux-dev-tools/main"
 INSTALL_PATH="/usr/local/bin/vf"
 
 echo "============================================="
