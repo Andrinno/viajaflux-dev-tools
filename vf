@@ -1,0 +1,181 @@
+#!/bin/bash
+
+VF_VERSION="1.0.0"
+VF_REPO="https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main"
+
+# Colors
+GREEN="\033[0;32m"
+BLUE="\033[0;34m"
+RED="\033[0;31m"
+YELLOW="\033[1;33m"
+NC="\033[0m"
+
+log() { echo -e "${GREEN}✔${NC} $1"; }
+info() { echo -e "${BLUE}ℹ${NC} $1"; }
+warn() { echo -e "${YELLOW}⚠${NC} $1"; }
+error() { echo -e "${RED}✖${NC} $1"; exit 1; }
+
+ensure_git() {
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || error "Este diretório não é um repositório Git."
+}
+
+# ----------------------
+# Update beta
+# ----------------------
+cmd_up() {
+  ensure_git
+  info "Atualizando beta..."
+  git fetch --all --prune
+  git checkout beta || error "Não foi possível mudar para beta."
+  git pull origin beta
+  log "Beta atualizado!"
+}
+
+# ----------------------
+# Feature
+# ----------------------
+cmd_feat() {
+  ensure_git
+  [[ -z "$1" ]] && error "Uso: vf feat nome-da-feature"
+
+  BR="feature/$1"
+
+  info "Atualizando beta..."
+  git fetch --all --prune
+  git checkout beta
+  git pull origin beta
+
+  info "Criando branch $BR"
+  git checkout -b "$BR"
+  log "Feature criada!"
+}
+
+# ----------------------
+# Hotfix
+# ----------------------
+cmd_hotfix() {
+  ensure_git
+  [[ -z "$1" ]] && error "Uso: vf hotfix nome"
+
+  BR="hotfix/$1"
+
+  info "Atualizando main..."
+  git fetch --all --prune
+  git checkout main
+  git pull origin main
+
+  info "Criando branch $BR"
+  git checkout -b "$BR"
+  log "Hotfix criado!"
+}
+
+# ----------------------
+# Sync main → beta
+# ----------------------
+cmd_sync() {
+  ensure_git
+  info "Sincronizando main → beta..."
+
+  git fetch --all --prune
+
+  git checkout main
+  git pull origin main
+
+  git checkout beta
+  git pull origin beta
+
+  git merge main || error "Erro ao fazer merge main → beta"
+  git push origin beta
+
+  log "Beta sincronizado!"
+}
+
+# ----------------------
+# Clean merged
+# ----------------------
+cmd_clean() {
+  ensure_git
+
+  info "Limpando branches mergeadas..."
+  git fetch --all --prune
+
+  git checkout beta
+  git pull origin beta
+
+  git branch --merged | grep -v "main\|beta" | while read BR; do
+    info "Removendo $BR"
+    git branch -d "$BR"
+  done
+
+  log "Limpeza concluída!"
+}
+
+# ----------------------
+# Show status
+# ----------------------
+cmd_status() {
+  ensure_git
+  echo -e "${BLUE}--- STATUS ---${NC}"
+  git status
+
+  echo
+  echo -e "${BLUE}--- BRANCHES ---${NC}"
+  git branch --sort=committerdate
+}
+
+# ----------------------
+# Version
+# ----------------------
+cmd_version() {
+  echo "$VF_VERSION"
+}
+
+# ----------------------
+# Auto-update
+# ----------------------
+cmd_update() {
+  echo "Atualizando vf-CLI..."
+
+  TEMP="$(mktemp)"
+  curl -fsSL "$VF_REPO/vf" -o "$TEMP" || error "Falha ao baixar nova versão"
+  chmod +x "$TEMP"
+
+  sudo mv "$TEMP" /usr/local/bin/vf
+
+  log "Atualizado para a última versão!"
+}
+
+# ----------------------
+# Help
+# ----------------------
+cmd_help() {
+cat <<EOF
+${BLUE}Viajaflux Git Flow Helper${NC}
+
+Comandos disponíveis:
+  vf up                Atualiza beta
+  vf feat NOME         Cria nova feature
+  vf hotfix NOME       Cria novo hotfix
+  vf sync              Merge main → beta
+  vf clean             Remove branches mergeadas
+  vf status            Status e branches
+  vf version           Mostra versão atual
+  vf update            Atualiza CLI
+  vf help              Mostra ajuda
+EOF
+}
+
+# Router
+case "$1" in
+  up) cmd_up ;;
+  feat) cmd_feat "$2" ;;
+  hotfix) cmd_hotfix "$2" ;;
+  sync) cmd_sync ;;
+  clean) cmd_clean ;;
+  status) cmd_status ;;
+  version) cmd_version ;;
+  update) cmd_update ;;
+  help|"") cmd_help ;;
+  *) error "Comando inválido. Use: vf help" ;;
+esac
+
