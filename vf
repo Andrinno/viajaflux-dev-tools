@@ -152,20 +152,19 @@ cmd_update() {
 # Help
 # ----------------------
 cmd_help() {
-  cat <<EOF
-${BLUE}Viajaflux Git Flow Helper${NC}
-
-Comandos disponíveis:
-  vf up                Atualiza beta
-  vf feat NOME         Cria nova feature
-  vf hotfix NOME       Cria novo hotfix
-  vf sync              Merge main → beta
-  vf clean             Remove branches mergeadas
-  vf status            Status e branches
-  vf version           Mostra versão atual
-  vf update            Atualiza CLI
-  vf help              Mostra ajuda
-EOF
+  echo -e "${BLUE}Viajaflux Git Flow Helper${NC}"
+  echo
+  echo -e "${GREEN}Comandos disponíveis:${NC}"
+  echo "  vf up                Atualiza beta"
+  echo "  vf feat NOME         Cria nova feature"
+  echo "  vf hotfix NOME       Cria novo hotfix"
+  echo "  vf sync              Merge main → beta"
+  echo "  vf clean             Remove branches mergeadas"
+  echo "  vf status            Status e branches"
+  echo "  vf version           Mostra versão atual"
+  echo "  vf update            Atualiza CLI"
+  echo "  vf help              Mostra ajuda"
+  echo
 }
 
 # Router
